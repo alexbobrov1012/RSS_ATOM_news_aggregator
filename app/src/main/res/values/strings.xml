@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">RSS_ATOM_news_aggregator</string>
+    <string name="action_settings">Settings</string>
+</resources>
