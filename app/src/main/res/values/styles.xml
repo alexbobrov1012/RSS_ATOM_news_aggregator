@@ -16,5 +16,16 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
+    <style name="title">
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">sans-serif-black</item>
+    </style>
+    <style name="contents">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-black</item>
+    </style>
+    <style name="date">
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">sans-serif-thin</item>
+    </style>
 </resources>

@@ -1,7 +1,9 @@
 package com.example.rss_atom_news_aggregator.Room;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
+
+
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 @Entity(tableName = "news_table")
 public class News {
@@ -51,6 +53,7 @@ public class News {
     public String getContent() {
         return content;
     }
+
     public String getLink() {
         return link;
     }

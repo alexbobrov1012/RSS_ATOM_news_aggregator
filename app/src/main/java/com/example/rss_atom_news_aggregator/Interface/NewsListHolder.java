@@ -1,0 +1,30 @@
+package com.example.rss_atom_news_aggregator.Interface;
+
+
+import android.view.View;
+import android.widget.TextView;
+import com.example.rss_atom_news_aggregator.R;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+public class NewsListHolder extends RecyclerView.ViewHolder {
+    private TextView titleView;
+
+    private TextView dateView;
+
+    private TextView contentsView;
+
+    public NewsListHolder(@NonNull View itemView) {
+        super(itemView);
+        this.titleView = itemView.findViewById(R.id.title);
+        this.dateView = itemView.findViewById(R.id.date);
+        this.contentsView = itemView.findViewById(R.id.contents);
+    }
+
+    public void bind(NewsListModel model) {
+        titleView.setText(model.getTitle());
+        dateView.setText(model.getDate());
+        contentsView.setText(model.getContents());
+    }
+
+}
