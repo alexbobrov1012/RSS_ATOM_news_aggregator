@@ -1,6 +1,8 @@
 package com.example.rss_atom_news_aggregator;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import com.example.rss_atom_news_aggregator.Room.News;
 import com.example.rss_atom_news_aggregator.Room.NewsDao;
@@ -22,21 +24,9 @@ public class NewsRepository {
         return mAllNews;
     }
 
-    public void insert(News word) {
-        new InsertAsyncTask(mNewsDao).execute(word);
+    public void fetchNews(Context context) {
+        Intent intent = new Intent(context, NewsService.class);
+        context.startService(intent);
     }
 
-    private static class InsertAsyncTask extends AsyncTask<News, Void, Void> {
-        private NewsDao mAsyncTaskDao;
-
-        InsertAsyncTask(NewsDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(final News... params) {
-            mAsyncTaskDao.insert(params[0]);
-            return null;
-        }
-    }
 }

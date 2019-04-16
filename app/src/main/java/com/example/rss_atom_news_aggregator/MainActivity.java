@@ -31,12 +31,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        final SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onRefresh() {
+                viewModel.fetchNews(MainActivity.this);
             }
         });
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
@@ -48,10 +47,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<News> news) {
                 adapter.setNews(news);
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
-
-
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.example.rss_atom_news_aggregator;
 
+import android.content.Context;
+
 import com.example.rss_atom_news_aggregator.Room.News;
 
 import java.util.List;
@@ -21,7 +23,8 @@ public class NewsViewModel extends ViewModel {
         return allNews;
     }
 
-    public void insert(News news) {
-        repository.insert(news);
+    public void fetchNews(Context context) {
+        repository.fetchNews(context);
     }
+
 }
