@@ -1,5 +1,7 @@
 package com.example.rss_atom_news_aggregator;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import android.view.View;
@@ -68,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
+            startActivity(browserIntent);
         }
 
         return super.onOptionsItemSelected(item);

@@ -10,7 +10,15 @@ import com.example.rss_atom_news_aggregator.Room.News;
 import com.example.rss_atom_news_aggregator.Room.NewsDao;
 import com.example.rss_atom_news_aggregator.Room.NewsRoomDatabase;
 
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.Nullable;
 
@@ -43,39 +51,42 @@ public class NewsService extends Service {
 
     private void someWork() {
         thread = new Thread(new Runnable() {
-            ArrayList listNews = new ArrayList<News>();
+            List listNews = new ArrayList<News>();
+            InputStream in = null;
+            NewsParser parser = new NewsParser();
             @Override
             public void run() {
                 // get and parse news
-                News news = new News("11.04.19", "Самый лучший заголовок", "сегодня" +
-                        " я начал делать проект", "https://github.com/bobrisha1012/RSS_ATOM_news" +
-                        "_aggregator");
-                listNews.add(news);
-                news = new News("14.04.19", "Порошенко приехал на стадион для дебатов с " +
-                        "Зеленским", "Президент Украины Петр Порошенко прибыл на стадион " +
-                        "«Олимпийский» для проведения дебатов с соперником по второму туру выборов " +
-                        "главы государства Владимиром Зеленским. Об этом сообщает украинский телеканал" +
-                        " «112».", "https://github.com/bobrisha1012/RSS_ATOM_news" +
-                        "_aggregator");
-                listNews.add(news);
-                news = new News("14.04.19", "Американец за 50 лет создал «волшебный» сад " +
-                        "(фото)", "Житель Филадельфии Исаия Загар с 1960-х непрерывно украшал " +
-                        "улицу возле своего дома эксцентричной мозаикой.\n" +
-                        "\n" +
-                        "Он использовал осколки разбитых зеркал, бутылки, бусины, осколки плитки, " +
-                        "камешки и даже велосипедные колеса. Это была попытка оживить убогий и лишенный" +
-                        " красоты район города.", "https://github.com/bobrisha1012/RSS_ATOM_news" +
-                        "_aggregator");
-                listNews.add(news);
+                Log.d(TAG, "in run..");
+                try {
+                    in = fetchNewsUrl("http://ports.com/feed/");
+                    if (in == null)
+                        Log.d(TAG, "instream is null");
+                    listNews = parser.parse(in);
+                } catch (XmlPullParserException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.d(TAG, "out run..");
                 insert(listNews);
             }
         });
         thread.start();
     }
 
-    public void insert(ArrayList<News> news) {
-        for (News tok : news)
+    public void insert(List<News> news) {
+        for (News tok : news) {
             mNewsDao.insert(tok);
+            Log.d(TAG, "insert");
+        }
+    }
+
+    private InputStream fetchNewsUrl(String link) throws IOException {
+        URL url = new URL(link);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.connect();
+        return connection.getInputStream();
     }
 
     @Nullable
