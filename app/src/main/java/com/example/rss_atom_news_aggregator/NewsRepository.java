@@ -1,9 +1,9 @@
 package com.example.rss_atom_news_aggregator;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
+
+import com.example.rss_atom_news_aggregator.Network.NewsService;
 import com.example.rss_atom_news_aggregator.Room.News;
 import com.example.rss_atom_news_aggregator.Room.NewsDao;
 import com.example.rss_atom_news_aggregator.Room.NewsRoomDatabase;

@@ -1,8 +1,7 @@
-package com.example.rss_atom_news_aggregator;
+package com.example.rss_atom_news_aggregator.Network;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -15,7 +14,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,13 +51,14 @@ public class NewsService extends Service {
         thread = new Thread(new Runnable() {
             List listNews = new ArrayList<News>();
             InputStream in = null;
-            NewsParser parser = new NewsParser();
+            //NewsParserRSS parser = new NewsParserRSS();
+            NewsParserATOM parser = new NewsParserATOM();
             @Override
             public void run() {
                 // get and parse news
                 Log.d(TAG, "in run..");
                 try {
-                    in = fetchNewsUrl("http://ports.com/feed/");
+                    in = fetchNewsUrl("https://ru-astroph.livejournal.com/data/atom");
                     if (in == null)
                         Log.d(TAG, "instream is null");
                     listNews = parser.parse(in);
