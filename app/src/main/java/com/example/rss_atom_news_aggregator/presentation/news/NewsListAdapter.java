@@ -1,11 +1,11 @@
-package com.example.rss_atom_news_aggregator.Interface;
+package com.example.rss_atom_news_aggregator.presentation.news;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.rss_atom_news_aggregator.R;
-import com.example.rss_atom_news_aggregator.Room.News;
+import com.example.rss_atom_news_aggregator.room.News;
 
 import java.util.List;
 
@@ -15,11 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 public class NewsListAdapter extends RecyclerView.Adapter<NewsListHolder> {
 
     private List<News> news;
+
     @NonNull
     @Override
     public NewsListHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item, parent, false);
+                .inflate(R.layout.news_list_item, parent, false);
         return new NewsListHolder(view);
     }
 

@@ -1,4 +1,4 @@
-package com.example.rss_atom_news_aggregator.Network;
+package com.example.rss_atom_news_aggregator.network;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;

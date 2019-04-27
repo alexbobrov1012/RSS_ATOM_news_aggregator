@@ -1,10 +1,10 @@
-package com.example.rss_atom_news_aggregator.Interface;
+package com.example.rss_atom_news_aggregator.presentation.news;
 
 
 import android.view.View;
 import android.widget.TextView;
 import com.example.rss_atom_news_aggregator.R;
-import com.example.rss_atom_news_aggregator.Room.News;
+import com.example.rss_atom_news_aggregator.room.News;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;

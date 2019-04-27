@@ -1,4 +1,4 @@
-package com.example.rss_atom_news_aggregator.Room;
+package com.example.rss_atom_news_aggregator.room;
 
 
 import androidx.annotation.NonNull;
@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "news_table")
 public class News {
+
     @PrimaryKey(autoGenerate = true)
     @NonNull
     private int id;

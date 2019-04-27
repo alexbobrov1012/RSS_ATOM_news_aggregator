@@ -1,4 +1,4 @@
-package com.example.rss_atom_news_aggregator.Room;
+package com.example.rss_atom_news_aggregator.room;
 
 import java.util.List;
 import androidx.lifecycle.LiveData;

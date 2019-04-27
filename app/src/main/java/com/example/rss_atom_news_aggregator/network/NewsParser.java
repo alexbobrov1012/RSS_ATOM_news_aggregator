@@ -1,9 +1,9 @@
-package com.example.rss_atom_news_aggregator.Network;
+package com.example.rss_atom_news_aggregator.network;
 
 import android.util.Log;
 import android.util.Xml;
 
-import com.example.rss_atom_news_aggregator.Room.News;
+import com.example.rss_atom_news_aggregator.room.News;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -102,6 +102,7 @@ public abstract class NewsParser {
         return false;
     }
 
+    // stringBuilder...
     private String replaceHTMLEscapes(String string) {
         string = string.replaceAll("&amp;", "&");
         string = string.replaceAll("&lt;", "<");

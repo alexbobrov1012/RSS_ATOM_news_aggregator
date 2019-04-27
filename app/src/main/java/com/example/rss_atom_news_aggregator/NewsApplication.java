@@ -1,8 +1,9 @@
 package com.example.rss_atom_news_aggregator;
 
 import android.app.Application;
+import android.content.Context;
 
-import com.example.rss_atom_news_aggregator.Room.NewsRoomDatabase;
+import com.example.rss_atom_news_aggregator.room.NewsRoomDatabase;
 
 import androidx.annotation.NonNull;
 import androidx.room.Room;
@@ -10,12 +11,18 @@ import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 public class NewsApplication extends Application {
-    private static volatile NewsRoomDatabase ourInstance;
+    private volatile NewsRoomDatabase DBInstance;
+
+    private NewsRepository RepoInstance;
+
+    public static NewsApplication appInstance;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        ourInstance = Room.databaseBuilder(this,
-                NewsRoomDatabase.class, "news_database")
+        appInstance = this;
+        DBInstance = Room.databaseBuilder(this,
+                NewsRoomDatabase.class, "news_database1")
                   .addCallback(new RoomDatabase.Callback() {
                       @Override
                       public void onOpen(@NonNull SupportSQLiteDatabase db) {
@@ -23,15 +30,25 @@ public class NewsApplication extends Application {
                           Thread thread = new Thread(new Runnable() {
                               @Override
                               public void run() {
-                                  ourInstance.newsDao().deleteAll();
+                                  DBInstance.newsDao().deleteAll();
                               }
                           });
                           thread.start();
                       }
                   })
                   .build();
+        RepoInstance = NewsRepository.getInstance(this);
     }
-    public static NewsRoomDatabase getOurInstance() {
-        return ourInstance;
+
+    private static NewsApplication getApplication(Context context) {
+        return (NewsApplication) context.getApplicationContext();
+    }
+
+    public NewsRoomDatabase getDBInstance() {
+        return DBInstance;
+    }
+
+    public NewsRepository getRepository() {
+        return RepoInstance;
     }
 }
