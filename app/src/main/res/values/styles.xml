@@ -31,6 +31,7 @@
         <item name="android:textSize">12sp</item>
         <item name="android:fontFamily">sans-serif-thin</item>
     </style>
+
     <style name="dialog_add_channel">
         <item name="android:fontFamily">casual</item>
         <item name="android:textSize">18sp</item>

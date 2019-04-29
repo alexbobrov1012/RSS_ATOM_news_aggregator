@@ -7,6 +7,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
 
 @Dao
 public interface ChannelDao {
@@ -21,4 +22,10 @@ public interface ChannelDao {
 
     @Query("delete from channel_table where id = :id")
     void delete(int id);
+
+    @Update
+    void update(Channel channel);
+
+    @Query("select id from channel_table where name = :name and link = :link")
+    int getId(String name, String link);
 }

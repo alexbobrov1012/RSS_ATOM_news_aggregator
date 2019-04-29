@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.example.rss_atom_news_aggregator.NewsApplication;
 import com.example.rss_atom_news_aggregator.NewsRepository;
 import com.example.rss_atom_news_aggregator.room.News;
 import com.example.rss_atom_news_aggregator.room.NewsDao;
@@ -53,7 +54,7 @@ public class NewsService extends Service {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                NewsRepository.getInstance(getApplicationContext()).serviceRoutine();
+                NewsApplication.appInstance.getRepository().serviceRoutine();
             }
         });
     }

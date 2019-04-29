@@ -51,4 +51,12 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListHolder> 
     public int getChannelId(int position) {
         return channels.get(position).getId();
     }
+
+    public String getChannelLink(int position) {
+        return channels.get(position).getLink();
+    }
+
+    public String getChannelName(int position) {
+        return channels.get(position).getName();
+    }
 }

@@ -28,4 +28,12 @@ public class ChannelViewModel extends ViewModel {
         NewsApplication.appInstance.getRepository().delete(id);
     }
 
+    public void update(Channel channel) {
+        NewsApplication.appInstance.getRepository().updateChannel(channel);
+    }
+
+    public int getChannelId(String name, String link) {
+        return NewsApplication.appInstance.getRepository().getChannelId(name, link);
+    }
+
 }

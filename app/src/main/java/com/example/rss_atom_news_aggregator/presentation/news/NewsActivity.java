@@ -4,12 +4,15 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.rss_atom_news_aggregator.NewsViewModel;
 import com.example.rss_atom_news_aggregator.R;
+import com.example.rss_atom_news_aggregator.presentation.OnItemListClickListener;
 import com.example.rss_atom_news_aggregator.room.News;
 
 import java.util.List;
@@ -22,16 +25,26 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-public class NewsActivity extends AppCompatActivity {
+public class NewsActivity extends AppCompatActivity implements OnItemListClickListener {
 
     private NewsViewModel viewModel;
+
     private String link;
+
+    NewsListAdapter adapter;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         link = getIntent().getExtras().getString("link");
-        Toast.makeText(this, link, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, link, Toast.LENGTH_SHORT).show();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //viewModel.fetchNews(NewsActivity.this, link);
@@ -44,7 +57,7 @@ public class NewsActivity extends AppCompatActivity {
             }
         });
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
-        final NewsListAdapter adapter = new NewsListAdapter();
+        adapter = new NewsListAdapter(this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         viewModel = ViewModelProviders.of(this).get(NewsViewModel.class);
@@ -52,10 +65,18 @@ public class NewsActivity extends AppCompatActivity {
         viewModel.getAllNews().observe(this, new Observer<List<News>>() {
             @Override
             public void onChanged(List<News> news) {
-                adapter.setNews(news);
+                if (!TextUtils.equals(link, viewModel.getChannelRepo())) {
+                    adapter.removeItems();
+                    Log.d("KEKE", "act");
+                } else {
+                    adapter.setNews(viewModel.getAllNews().getValue());
+                    Log.d("KEKE", "act1");
+                }
             }
         });
         viewModel.fetchNews(NewsActivity.this, link);
+        adapter.setNews(viewModel.getAllNews().getValue());
+
     }
 
     @Override
@@ -80,4 +101,12 @@ public class NewsActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onItemListClick(int position, String link) {
+        Intent intent = new Intent(this, WebActivity.class);
+        intent.putExtra("link", link);
+        startActivity(intent);
+    }
+
 }

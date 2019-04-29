@@ -3,6 +3,7 @@ package com.example.rss_atom_news_aggregator.room;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "channel_table")
@@ -16,6 +17,12 @@ public class Channel {
     private String link;
 
     public Channel(String name, String link) {
+        this.name = name;
+        this.link = link;
+    }
+    @Ignore
+    public Channel(int id, String name, String link) {
+        this.id = id;
         this.name = name;
         this.link = link;
     }

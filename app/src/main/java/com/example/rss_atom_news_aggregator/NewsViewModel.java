@@ -30,4 +30,7 @@ public class NewsViewModel extends ViewModel {
         this.currentChannel = currentChannel;
     }
 
+    public String getChannelRepo() {
+       return NewsApplication.appInstance.getRepository().getCurrentChannel();
+    }
 }

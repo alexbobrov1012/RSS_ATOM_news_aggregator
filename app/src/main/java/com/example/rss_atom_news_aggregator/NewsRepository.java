@@ -3,6 +3,7 @@ package com.example.rss_atom_news_aggregator;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -46,23 +47,15 @@ public class NewsRepository {
 
     Executor executor;
 
-    private final String TAG_SERVICE = "Service";
+    private final String TAG_SERVICE = "REpo";
 
-    private NewsRepository(Context context) {
+    public NewsRepository() {
         NewsRoomDatabase db = NewsApplication.appInstance.getDBInstance();
         newsDao = db.newsDao();
         channelDao = db.channelDao();
         AllNews = newsDao.getAllNews();
         AllChannels = channelDao.getAllChannels();
         currentChannel = "";
-    }
-
-    public static NewsRepository getInstance(Context context) {
-        if (NewsApplication.appInstance.getRepository() == null) {
-            return new NewsRepository(context);
-        } else {
-            return NewsApplication.appInstance.getRepository();
-        }
     }
 
     LiveData<List<News>> getAllNews() {
@@ -84,23 +77,26 @@ public class NewsRepository {
                 Log.d(TAG_SERVICE, "instream is null");
             listNews = parser.parse(in);
             in.close();
+            deleteAll();
+            insert(listNews);
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        deleteAll();
-        insert(listNews);
+        connection.disconnect();
         Log.d(TAG_SERVICE, "out run..");
     }
 
     public void fetchNews(Context context, String channelLink) {
-        if (currentChannel.equals(channelLink)) {
+        if (TextUtils.equals(channelLink,currentChannel)) {
             // fetch from db
+            Log.d("KEKE", "DB");
             AllNews = newsDao.getAllNews();
             return;
 
-        } else {
+        } else if (isOnline()){
+            Log.d("KEKE", "SERV");
             currentChannel = channelLink;
             // fetch from network
             if (currentChannel.toLowerCase().contains("rss")) {
@@ -114,9 +110,9 @@ public class NewsRepository {
             }
             Intent intent = new Intent(context, NewsService.class);
             context.startService(intent);
-            //connection.disconnect();
+        } else {
+            Log.d("KEKE", "else");
         }
-
     }
 
     private InputStream getInputStream(String link) throws IOException {
@@ -159,5 +155,31 @@ public class NewsRepository {
 
     public void setCurrentChannel(String currentChannel) {
         this.currentChannel = currentChannel;
+    }
+
+    public String getCurrentChannel() {
+        return currentChannel;
+    }
+
+    public boolean isOnline() {
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+            int exitValue = ipProcess.waitFor();
+            return (exitValue == 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void updateChannel(Channel channel) {
+        channelDao.update(channel);
+    }
+
+    public int getChannelId(String name, String link) {
+        return channelDao.getId(name, link);
     }
 }

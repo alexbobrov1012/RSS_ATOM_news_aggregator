@@ -11,7 +11,7 @@ import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 public class NewsApplication extends Application {
-    private volatile NewsRoomDatabase DBInstance;
+    private NewsRoomDatabase DBInstance;
 
     private NewsRepository RepoInstance;
 
@@ -37,11 +37,7 @@ public class NewsApplication extends Application {
                       }
                   })
                   .build();
-        RepoInstance = NewsRepository.getInstance(this);
-    }
-
-    private static NewsApplication getApplication(Context context) {
-        return (NewsApplication) context.getApplicationContext();
+        RepoInstance = new NewsRepository();
     }
 
     public NewsRoomDatabase getDBInstance() {
