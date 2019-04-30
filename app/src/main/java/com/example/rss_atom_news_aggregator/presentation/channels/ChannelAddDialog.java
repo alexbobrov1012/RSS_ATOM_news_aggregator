@@ -23,7 +23,7 @@ public class ChannelAddDialog extends DialogFragment {
 
     EditText nameText;
 
-    SharedPreferences sPref;
+    SharedPreferences sharedPref;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,19 +63,19 @@ public class ChannelAddDialog extends DialogFragment {
     }
 
     private void saveState() {
-        sPref = NewsApplication.appInstance.getSharedPreferences("dialog_add",
+        sharedPref = NewsApplication.appInstance.getSharedPreferences("dialog_add",
                 Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sPref.edit();
+        SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("channel_name", nameText.getText().toString());
         editor.putString("channel_link", linkText.getText().toString());
         editor.apply();
     }
 
     private void loadState() {
-        sPref = NewsApplication.appInstance.getSharedPreferences("dialog_add",
+        sharedPref = NewsApplication.appInstance.getSharedPreferences("dialog_add",
                 Context.MODE_PRIVATE);
-        String name = sPref.getString("channel_name","");
-        String link = sPref.getString("channel_link","");
+        String name = sharedPref.getString("channel_name","");
+        String link = sharedPref.getString("channel_link","");
         nameText.setText(name);
         linkText.setText(link);
     }

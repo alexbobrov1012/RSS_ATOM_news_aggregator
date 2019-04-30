@@ -3,6 +3,7 @@ package com.example.rss_atom_news_aggregator;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -11,6 +12,7 @@ import com.example.rss_atom_news_aggregator.network.NewsParser;
 import com.example.rss_atom_news_aggregator.network.NewsParserATOM;
 import com.example.rss_atom_news_aggregator.network.NewsParserRSS;
 import com.example.rss_atom_news_aggregator.network.NewsService;
+import com.example.rss_atom_news_aggregator.network.NewsWorker;
 import com.example.rss_atom_news_aggregator.room.Channel;
 import com.example.rss_atom_news_aggregator.room.ChannelDao;
 import com.example.rss_atom_news_aggregator.room.News;
@@ -27,8 +29,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 public class NewsRepository {
     private NewsDao newsDao;
@@ -45,9 +55,13 @@ public class NewsRepository {
 
     private HttpURLConnection connection;
 
-    Executor executor;
+    private Executor executor;
 
-    private final String TAG_SERVICE = "REpo";
+    private PeriodicWorkRequest NewsWorkRequestPeriodic;
+
+    private OneTimeWorkRequest NewsWorkRequest;
+
+    private final String TAG_SERVICE = "Worker";
 
     public NewsRepository() {
         NewsRoomDatabase db = NewsApplication.appInstance.getDBInstance();
@@ -91,12 +105,10 @@ public class NewsRepository {
     public void fetchNews(Context context, String channelLink) {
         if (TextUtils.equals(channelLink,currentChannel)) {
             // fetch from db
-            Log.d("KEKE", "DB");
             AllNews = newsDao.getAllNews();
             return;
 
-        } else if (isOnline()){
-            Log.d("KEKE", "SERV");
+        } else {
             currentChannel = channelLink;
             // fetch from network
             if (currentChannel.toLowerCase().contains("rss")) {
@@ -108,10 +120,21 @@ public class NewsRepository {
                 parser = new NewsParserATOM();
 
             }
-            Intent intent = new Intent(context, NewsService.class);
-            context.startService(intent);
-        } else {
-            Log.d("KEKE", "else");
+
+            Constraints constraints = new Constraints.Builder().setRequiredNetworkType(
+                    NetworkType.CONNECTED).build();
+            if (NewsWorkRequestPeriodic == null) {
+                NewsWorkRequestPeriodic = new PeriodicWorkRequest.Builder(
+                        NewsWorker.class, getRepeatInterval(), TimeUnit.MINUTES)
+                        .setConstraints(constraints)
+                          .build();
+                WorkManager.getInstance().enqueueUniquePeriodicWork("fetch_news_worker",
+                        ExistingPeriodicWorkPolicy.REPLACE, NewsWorkRequestPeriodic);
+            } else {
+                NewsWorkRequest = new OneTimeWorkRequest.Builder(NewsWorker.class).
+                        setConstraints(constraints).build();
+                WorkManager.getInstance().enqueue(NewsWorkRequest);
+            }
         }
     }
 
@@ -120,6 +143,13 @@ public class NewsRepository {
         connection = (HttpURLConnection) url.openConnection();
         connection.connect();
         return connection.getInputStream();
+    }
+
+    private int getRepeatInterval() {
+        SharedPreferences sharedPref = NewsApplication.appInstance.getSharedPreferences("settings_dialog",
+                Context.MODE_PRIVATE);
+        return sharedPref.getInt("period",0);
+
     }
     
     private void insert(List<News> newsList) {
@@ -159,20 +189,6 @@ public class NewsRepository {
 
     public String getCurrentChannel() {
         return currentChannel;
-    }
-
-    public boolean isOnline() {
-        Runtime runtime = Runtime.getRuntime();
-        try {
-            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
-            int exitValue = ipProcess.waitFor();
-            return (exitValue == 0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return false;
     }
 
     public void updateChannel(Channel channel) {

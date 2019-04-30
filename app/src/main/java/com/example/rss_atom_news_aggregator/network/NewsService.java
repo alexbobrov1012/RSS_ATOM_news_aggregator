@@ -29,7 +29,7 @@ public class NewsService extends Service {
 
     Executor executor;
 
-    private final String TAG = "Service";
+    private final String TAG = "NewsService";
 
     @Override
     public void onCreate() {
@@ -40,6 +40,7 @@ public class NewsService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         someWork();
+        Log.d(TAG, "StartCommand");
         return super.onStartCommand(intent, flags, startId);
     }
 

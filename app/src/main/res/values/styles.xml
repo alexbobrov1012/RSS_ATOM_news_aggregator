@@ -36,5 +36,9 @@
         <item name="android:fontFamily">casual</item>
         <item name="android:textSize">18sp</item>
         <item name="android:padding">8sp</item>
+        <item name="android:elevation">3sp</item>
+    </style>
+    <style name="dialog_settings" parent="dialog_add_channel">
+        <item name="android:textStyle">bold</item>
     </style>
 </resources>

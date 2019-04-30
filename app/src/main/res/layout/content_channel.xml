@@ -16,10 +16,10 @@
         tools:text="werwet" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/settings_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:text="@string/settings_title" />
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"

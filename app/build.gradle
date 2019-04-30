@@ -39,4 +39,7 @@ dependencies {
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     implementation 'androidx.appcompat:appcompat:1.1.0-alpha04'
+    // WorkManager
+    def versions_work = "2.0.1"
+    implementation "androidx.work:work-runtime:$versions_work"
 }

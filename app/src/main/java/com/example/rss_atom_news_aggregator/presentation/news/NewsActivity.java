@@ -25,6 +25,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import static android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP;
+
 public class NewsActivity extends AppCompatActivity implements OnItemListClickListener {
 
     private NewsViewModel viewModel;
@@ -106,6 +108,7 @@ public class NewsActivity extends AppCompatActivity implements OnItemListClickLi
     public void onItemListClick(int position, String link) {
         Intent intent = new Intent(this, WebActivity.class);
         intent.putExtra("link", link);
+        intent.setFlags(FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
     }
 
