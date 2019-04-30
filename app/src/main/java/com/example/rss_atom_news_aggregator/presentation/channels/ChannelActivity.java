@@ -1,20 +1,15 @@
 package com.example.rss_atom_news_aggregator.presentation.channels;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Patterns;
 
 import com.example.rss_atom_news_aggregator.ChannelViewModel;
-import com.example.rss_atom_news_aggregator.NewsApplication;
 import com.example.rss_atom_news_aggregator.presentation.news.NewsActivity;
 import com.example.rss_atom_news_aggregator.R;
 import com.example.rss_atom_news_aggregator.presentation.OnItemListClickListener;
 import com.example.rss_atom_news_aggregator.room.Channel;
-import com.example.rss_atom_news_aggregator.utils;
+import com.example.rss_atom_news_aggregator.Utils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,9 +24,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.util.List;
 
 import static android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP;
@@ -108,7 +101,7 @@ public class ChannelActivity extends AppCompatActivity implements OnItemListClic
             String link = linkText.getText().toString();
 
 
-            if (utils.validateInputChannel(name, link, this)) {
+            if (Utils.validateInputChannel(name, link, this)) {
                 channel = new Channel(nameText.getText().toString(), linkText.getText().toString());
                 viewModel.addChannel(channel);
                 dialogAdd.dismiss();

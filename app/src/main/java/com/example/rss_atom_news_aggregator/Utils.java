@@ -5,7 +5,7 @@ import android.text.TextUtils;
 import android.util.Patterns;
 import android.widget.Toast;
 
-public class utils {
+public class Utils {
     public static boolean validateInputChannel(String name, String link, Context context) {
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(link)) {
             Toast hint = Toast.makeText(context.getApplicationContext(), R.string.error_dialog_empty,
