@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -19,6 +20,10 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.rss_atom_news_aggregator.NewsApplication;
 import com.example.rss_atom_news_aggregator.R;
+import com.example.rss_atom_news_aggregator.Utils;
+import com.example.rss_atom_news_aggregator.room.News;
+
+import java.util.Locale;
 
 public class SettingsDialog extends DialogFragment {
     SharedPreferences sharedPref;
@@ -35,7 +40,6 @@ public class SettingsDialog extends DialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @NonNull
@@ -50,6 +54,7 @@ public class SettingsDialog extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
+        NewsApplication.appInstance.updateLocale(getDialog().getContext());
         periodSeekBar = this.getDialog().findViewById(R.id.period_seekBar);
         seekBarView = this.getDialog().findViewById(R.id.seekBar_textView);
         seekBarView.setText(String.valueOf(periodSeekBar.getProgress()));
@@ -79,6 +84,8 @@ public class SettingsDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
                 saveState();
+                NewsApplication.appInstance.updateLocale(getDialog().getContext().getApplicationContext());
+                getActivity().recreate();
                 getDialog().dismiss();
             }
         });

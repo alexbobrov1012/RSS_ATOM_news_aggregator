@@ -1,10 +1,15 @@
 package com.example.rss_atom_news_aggregator.presentation.channels;
 
+import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 
 import com.example.rss_atom_news_aggregator.ChannelViewModel;
+import com.example.rss_atom_news_aggregator.NewsApplication;
 import com.example.rss_atom_news_aggregator.presentation.news.NewsActivity;
 import com.example.rss_atom_news_aggregator.R;
 import com.example.rss_atom_news_aggregator.presentation.OnItemListClickListener;
@@ -12,6 +17,7 @@ import com.example.rss_atom_news_aggregator.room.Channel;
 import com.example.rss_atom_news_aggregator.Utils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
@@ -20,8 +26,10 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.transition.Explode;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -43,13 +51,28 @@ public class ChannelActivity extends AppCompatActivity implements OnItemListClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+        NewsApplication.appInstance.updateLocale(this);
         setContentView(R.layout.activity_channel);
         Toolbar toolbar = findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         dialogAdd = new ChannelAddDialog();
         dialogSettings = new SettingsDialog();
         Intent intent = getIntent();
-        Uri data = intent.getData();
+        String action = intent.getAction();
+        String data = null;
+        if (Intent.ACTION_SEND.equals(action)) {
+            data = intent.getStringExtra(Intent.EXTRA_TEXT);
+        } else if (Intent.ACTION_VIEW.equals(action)) {
+            data = intent.getData().toString();
+        }
         if (data != null) {
             Bundle arg = new Bundle();
             arg.putCharSequence("link", data.toString());
@@ -63,7 +86,6 @@ public class ChannelActivity extends AppCompatActivity implements OnItemListClic
                 dialogAdd.show(getSupportFragmentManager(), "add_channel");
             }
         });
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         RecyclerView recyclerView = findViewById(R.id.recyclerview_channel);
         adapter = new ChannelListAdapter(this);
         recyclerView.setAdapter(adapter);
@@ -86,6 +108,12 @@ public class ChannelActivity extends AppCompatActivity implements OnItemListClic
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //NewsApplication.appInstance.updateLocale(this);
+    }
+
     public void dialogClick(View view) {
         if (view.getId() == R.id.button_ok) {
             // create new channel
@@ -100,12 +128,13 @@ public class ChannelActivity extends AppCompatActivity implements OnItemListClic
             String name = nameText.getText().toString();
             String link = linkText.getText().toString();
 
-
             if (Utils.validateInputChannel(name, link, this)) {
                 channel = new Channel(nameText.getText().toString(), linkText.getText().toString());
                 viewModel.addChannel(channel);
                 dialogAdd.dismiss();
             }
+            nameText.getText().clear();
+            linkText.getText().clear();
         } else if (view.getId() == R.id.button_cancel) {
             dialogAdd.dismiss();
         }
@@ -114,9 +143,11 @@ public class ChannelActivity extends AppCompatActivity implements OnItemListClic
     @Override
     public void onItemListClick(int position, String link) {
         Intent intent = new Intent(this, NewsActivity.class);
+        String name = adapter.getChannelName(position);
         intent.putExtra("link", link);
+        intent.putExtra("name", name);
         intent.setFlags(FLAG_ACTIVITY_SINGLE_TOP);
-        startActivity(intent);
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
 
     }
 }

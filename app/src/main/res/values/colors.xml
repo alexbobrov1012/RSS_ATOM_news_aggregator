@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="colorRecycleView">#CD4F9EEC</color>
+    <color name="colorRecycleViewHover">#CD82A5CC</color>
     <color name="white">#FFFFFFFF</color>
 </resources>
 

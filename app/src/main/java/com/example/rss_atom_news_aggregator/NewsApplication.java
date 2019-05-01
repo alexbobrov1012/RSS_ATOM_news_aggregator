@@ -2,6 +2,8 @@ package com.example.rss_atom_news_aggregator;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 
 import com.example.rss_atom_news_aggregator.room.NewsRoomDatabase;
 
@@ -38,6 +40,7 @@ public class NewsApplication extends Application {
                   })
                   .build();
         RepoInstance = new NewsRepository();
+        NewsApplication.appInstance.updateLocale(this);
     }
 
     public NewsRoomDatabase getDBInstance() {
@@ -46,5 +49,17 @@ public class NewsApplication extends Application {
 
     public NewsRepository getRepository() {
         return RepoInstance;
+    }
+
+    public void updateLocale(Context context) {
+        SharedPreferences sharedPref = NewsApplication.appInstance.getSharedPreferences("settings_dialog",
+                Context.MODE_PRIVATE);
+        long language = sharedPref.getLong("language",0);
+        if (language == 0) {
+            Utils.updateResources(context, "en");
+        }
+        else if (language == 1) {
+            Utils.updateResources(context, "ru");
+        }
     }
 }

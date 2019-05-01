@@ -1,13 +1,22 @@
 package com.example.rss_atom_news_aggregator.presentation.news;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
 import android.text.TextUtils;
+import android.transition.AutoTransition;
+import android.transition.ChangeBounds;
+import android.transition.ChangeClipBounds;
+import android.transition.ChangeTransform;
+import android.transition.Explode;
+import android.transition.Fade;
+import android.transition.Slide;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.widget.Toast;
 
 import com.example.rss_atom_news_aggregator.NewsViewModel;
@@ -44,8 +53,14 @@ public class NewsActivity extends AppCompatActivity implements OnItemListClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+
+        getWindow().setExitTransition(new Fade());
+        getWindow().setEnterTransition(new Slide());
         setContentView(R.layout.activity_main);
         link = getIntent().getExtras().getString("link");
+        String name = getIntent().getExtras().getString("name");
+        setTitle(name);
         //Toast.makeText(this, link, Toast.LENGTH_SHORT).show();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -69,10 +84,8 @@ public class NewsActivity extends AppCompatActivity implements OnItemListClickLi
             public void onChanged(List<News> news) {
                 if (!TextUtils.equals(link, viewModel.getChannelRepo())) {
                     adapter.removeItems();
-                    Log.d("KEKE", "act");
                 } else {
                     adapter.setNews(viewModel.getAllNews().getValue());
-                    Log.d("KEKE", "act1");
                 }
             }
         });
@@ -82,34 +95,13 @@ public class NewsActivity extends AppCompatActivity implements OnItemListClickLi
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
-            startActivity(browserIntent);
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onItemListClick(int position, String link) {
         Intent intent = new Intent(this, WebActivity.class);
+        String title = adapter.getNewsTitle(position);
         intent.putExtra("link", link);
+        intent.putExtra("title", title);
         intent.setFlags(FLAG_ACTIVITY_SINGLE_TOP);
-        startActivity(intent);
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
 }

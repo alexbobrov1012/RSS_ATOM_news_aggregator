@@ -52,4 +52,8 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListHolder> {
         if (news != null)
             news = null;
     }
+
+    public String getNewsTitle(int position) {
+        return news.get(position).getTitle();
+    }
 }
