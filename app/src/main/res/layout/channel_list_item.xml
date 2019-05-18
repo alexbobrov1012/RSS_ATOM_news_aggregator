@@ -16,6 +16,6 @@
         android:layout_height="wrap_content"
         android:elevation="10sp"
         android:transitionName="transNews"
-        style="@style/title"
+        style="@style/Title"
         />
 </LinearLayout>

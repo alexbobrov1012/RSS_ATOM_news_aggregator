@@ -64,6 +64,8 @@ public class NewsActivity extends AppCompatActivity implements OnItemListClickLi
         //Toast.makeText(this, link, Toast.LENGTH_SHORT).show();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         //viewModel.fetchNews(NewsActivity.this, link);
         final SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -102,6 +104,12 @@ public class NewsActivity extends AppCompatActivity implements OnItemListClickLi
         intent.putExtra("title", title);
         intent.setFlags(FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
 }

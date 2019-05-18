@@ -38,6 +38,8 @@ public class WebActivity extends AppCompatActivity {
         setTitle(title);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         WebViewClient webViewClient = new WebViewClient() {
 
@@ -71,6 +73,12 @@ public class WebActivity extends AppCompatActivity {
         swipeRefreshLayout.setRefreshing(false);
         //Toast toast = Toast.makeText(this, newsLink + "e", Toast.LENGTH_LONG);
         //toast.show();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
 }

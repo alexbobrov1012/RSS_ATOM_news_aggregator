@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:text="@string/settings_title"
         android:background="@color/colorPrimary"
-        style="@style/dialog_settings"/>
+        style="@style/DialogSettings"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,14 +18,14 @@
 
         <TextView
             android:id="@+id/period_textView"
-            style="@style/dialog_settings"
+            style="@style/DialogSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/settings_period" />
 
         <TextView
             android:id="@+id/seekBar_textView"
-            style="@style/dialog_settings"
+            style="@style/DialogSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -45,13 +45,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/settings_lang"
-        style="@style/dialog_settings"/>
+        style="@style/DialogSettings"/>
 
     <Spinner
         android:id="@+id/lang_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/dialog_settings"/>
+        style="@style/DialogSettings"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

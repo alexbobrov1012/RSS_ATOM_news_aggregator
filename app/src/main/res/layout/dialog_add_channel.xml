@@ -1,60 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:background="@drawable/dialod_add_channel_shape">
+
     <TextView
         android:id="@+id/textView"
+        style="@style/DialogAddChannel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/dialog_add_title"
-        android:padding="10sp"
-        style="@style/dialog_add_channel"
         android:background="@color/colorPrimary"
-        android:textColor="@color/white"/>
+        android:padding="10sp"
+        android:text="@string/dialog_add_title"
+        android:textColor="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="10dp" />
+
     <EditText
         android:id="@+id/channel_name_text"
-        android:inputType="text"
+        style="@style/DialogAddChannel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginLeft="4dp"
+        android:layout_marginTop="16dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="4dp"
         android:hint="@string/channel_name_hint"
-        style="@style/dialog_add_channel"/>
+        android:inputType="text"
+        app:layout_constraintTop_toBottomOf="@id/textView"/>
+
     <EditText
         android:id="@+id/channel_link_text"
-        android:inputType="textUri"
+        style="@style/DialogAddChannel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
         android:layout_marginLeft="4dp"
+        android:layout_marginTop="4dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="16dp"
         android:hint="@string/channel_link_hint"
-        style="@style/dialog_add_channel"/>
+        android:inputType="textUri"
+        app:layout_constraintTop_toBottomOf="@id/channel_name_text"/>
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/channel_link_text"
+        tools:layout_editor_absoluteX="10dp">
+
         <Button
             android:id="@+id/button_cancel"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/cancel"
             android:onClick="dialogClick"
-            style="@style/Base.Widget.AppCompat.Button.Borderless"/>
+            android:text="@string/cancel"
+            app:layout_constraintTop_toBottomOf="@id/channel_link_text" />
+
         <Button
             android:id="@+id/button_ok"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/add"
             android:onClick="dialogClick"
-            style="@style/Base.Widget.AppCompat.Button.Borderless"/>
+            android:text="@string/add"
+            app:layout_constraintTop_toBottomOf="@id/channel_link_text" />
     </LinearLayout>
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 

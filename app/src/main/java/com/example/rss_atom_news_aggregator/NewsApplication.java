@@ -13,9 +13,9 @@ import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 public class NewsApplication extends Application {
-    private NewsRoomDatabase DBInstance;
+    private NewsRoomDatabase dbInstance;
 
-    private NewsRepository RepoInstance;
+    private NewsRepository repoInstance;
 
     public static NewsApplication appInstance;
 
@@ -23,7 +23,7 @@ public class NewsApplication extends Application {
     public void onCreate() {
         super.onCreate();
         appInstance = this;
-        DBInstance = Room.databaseBuilder(this,
+        dbInstance = Room.databaseBuilder(this,
                 NewsRoomDatabase.class, "news_database1")
                   .addCallback(new RoomDatabase.Callback() {
                       @Override
@@ -32,23 +32,23 @@ public class NewsApplication extends Application {
                           Thread thread = new Thread(new Runnable() {
                               @Override
                               public void run() {
-                                  DBInstance.newsDao().deleteAll();
+                                  dbInstance.newsDao().deleteAll();
                               }
                           });
                           thread.start();
                       }
                   })
                   .build();
-        RepoInstance = new NewsRepository();
+        repoInstance = new NewsRepository();
         NewsApplication.appInstance.updateLocale(this);
     }
 
     public NewsRoomDatabase getDBInstance() {
-        return DBInstance;
+        return dbInstance;
     }
 
     public NewsRepository getRepository() {
-        return RepoInstance;
+        return repoInstance;
     }
 
     public void updateLocale(Context context) {
