@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="20dp"
-    android:clickable="true"
-    android:orientation="vertical"
-    android:theme="@style/Base.CardView"
-    android:background="@drawable/hover"
-    android:elevation="10sp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardBackgroundColor="@android:color/white"
+    style="@style/MyCardView">
     <TextView
         android:id="@+id/channelName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="10sp"
         android:transitionName="transNews"
-        style="@style/Title"
-        />
-</LinearLayout>
+        style="@style/Title" />
+</androidx.cardview.widget.CardView>

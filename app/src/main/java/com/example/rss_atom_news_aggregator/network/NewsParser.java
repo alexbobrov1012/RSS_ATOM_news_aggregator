@@ -3,6 +3,9 @@ package com.example.rss_atom_news_aggregator.network;
 import android.util.Log;
 import android.util.Xml;
 
+import androidx.core.text.HtmlCompat;
+
+import com.example.rss_atom_news_aggregator.Utils;
 import com.example.rss_atom_news_aggregator.room.News;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -14,24 +17,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class NewsParser {
-    protected static final String LOG_TAG = "Parser";
+    static final String LOG_TAG = "Parser";
 
-    protected String newsTag;
+    String newsTag;
 
-    protected String newsTagTitle;
+    String newsTagTitle;
 
-    protected List<String> newsTagsDate;
+    List<String> newsTagsDate;
 
-    protected List<String> newsTagsContents;
+    List<String> newsTagsContents;
 
-    protected String newsTagLink;
+    String newsTagLink;
 
-    public NewsParser() {
+    NewsParser() {
         newsTagsContents = new ArrayList<>();
         newsTagsDate = new ArrayList<>();
     }
 
-    public final List parse(InputStream in) throws XmlPullParserException, IOException {
+    public final List<News> parse(InputStream in) throws XmlPullParserException, IOException {
         try {
             XmlPullParser parser = Xml.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
@@ -83,9 +86,13 @@ public abstract class NewsParser {
                 skip(parser);
             }
         }
-        title = replaceHTMLEscapes(title);
-        contents = replaceHTMLEscapes(contents);
-        Log.d(LOG_TAG, "heh");
+        if (title != null) {
+            title = HtmlCompat.fromHtml(title, HtmlCompat.FROM_HTML_MODE_LEGACY).toString();
+        }
+        if (contents != null) {
+            contents = HtmlCompat.fromHtml(contents, HtmlCompat.FROM_HTML_MODE_LEGACY).toString();
+        }
+        date = Utils.parseDate(date);
         return new News(date,title,contents,link);
     }
 
@@ -100,19 +107,6 @@ public abstract class NewsParser {
             }
         }
         return false;
-    }
-
-    // stringBuilder...
-    private String replaceHTMLEscapes(String string) {
-        string = string.replaceAll("&amp;", "&");
-        string = string.replaceAll("&lt;", "<");
-        string = string.replaceAll("&gt;", ">");
-        string = string.replaceAll("&quot;", "\"");
-        string = string.replaceAll("<br>", "\n");
-        string = string.replaceAll("</br>", "");
-        string = string.replaceAll("<p>", "\n    ");
-        string = string.replaceAll("</p>", "");
-        return string;
     }
 
     private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
@@ -144,19 +138,19 @@ public abstract class NewsParser {
         return result;
     }
 
-    public String readTitle(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private String readTitle(XmlPullParser parser) throws IOException, XmlPullParserException {
         return readText(parser);
     }
 
-    public String readDate(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private String readDate(XmlPullParser parser) throws IOException, XmlPullParserException {
         return readText(parser);
     }
 
-    public String readContents(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private String readContents(XmlPullParser parser) throws IOException, XmlPullParserException {
         return readText(parser);
     }
 
-    public String readLink(XmlPullParser parser) throws IOException, XmlPullParserException {
+    protected String readLink(XmlPullParser parser) throws IOException, XmlPullParserException {
         return readText(parser);
     }
 

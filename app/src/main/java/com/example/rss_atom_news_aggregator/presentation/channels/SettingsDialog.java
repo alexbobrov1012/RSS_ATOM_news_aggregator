@@ -1,8 +1,6 @@
 package com.example.rss_atom_news_aggregator.presentation.channels;
 
 import android.app.Dialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,25 +16,24 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.rss_atom_news_aggregator.NewsApplication;
 import com.example.rss_atom_news_aggregator.R;
-import com.example.rss_atom_news_aggregator.Utils;
-import com.example.rss_atom_news_aggregator.room.News;
+import com.example.rss_atom_news_aggregator.StateKeeper;
 
-import java.util.Locale;
+import java.util.HashMap;
+
+import java.util.Map;
+import java.util.Objects;
 
 public class SettingsDialog extends DialogFragment {
-    SharedPreferences sharedPref;
     
-    SeekBar periodSeekBar;
+    private SeekBar periodSeekBar;
 
-    Spinner langSpinner;
+    private Spinner langSpinner;
 
-    TextView seekBarView;
+    private TextView seekBarView;
 
-    Button applyButton;
+    private Map<String, String> settingsMap;
 
-    Button cancelButton;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,16 +42,17 @@ public class SettingsDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        builder.setView(inflater.inflate(R.layout.dialog_settings,null));
+        builder.setView(inflater.inflate(R.layout.dialog_settings, null));
         return builder.create();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        NewsApplication.appInstance.updateLocale(getDialog().getContext());
+        StateKeeper.updateLocale(Objects.requireNonNull(getDialog()).getContext());
+        Log.v("LOCALE", "Settings");
         periodSeekBar = this.getDialog().findViewById(R.id.period_seekBar);
         seekBarView = this.getDialog().findViewById(R.id.seekBar_textView);
         seekBarView.setText(String.valueOf(periodSeekBar.getProgress()));
@@ -74,29 +72,35 @@ public class SettingsDialog extends DialogFragment {
 
             }
         });
-
+        settingsMap = new HashMap<>();
         String[] data = getResources().getStringArray(R.array.language_array);
         langSpinner = this.getDialog().findViewById(R.id.lang_spinner);
-        ArrayAdapter adapter = new ArrayAdapter<>(this.getContext(), R.layout.spinner_layout, data);
+        ArrayAdapter adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()),
+                R.layout.spinner_layout, data);
         langSpinner.setAdapter(adapter);
-        applyButton = this.getDialog().findViewById(R.id.button_apply);
+        Button applyButton = this.getDialog().findViewById(R.id.button_apply);
         applyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveState();
-                NewsApplication.appInstance.updateLocale(getDialog().getContext().getApplicationContext());
-                getActivity().recreate();
+                settingsMap.put(StateKeeper.KEY_PERIOD, String.valueOf(periodSeekBar.getProgress()));
+                settingsMap.put(StateKeeper.KEY_LANGUAGE, String.valueOf(langSpinner.getSelectedItemId()));
+                StateKeeper.saveState(StateKeeper.OPTION.SETTINGS_DIALOG, settingsMap);
+                StateKeeper.updateLocale(getDialog().getContext().getApplicationContext());
+                Log.v("LOCALE", "Settings2");
+                Objects.requireNonNull(getActivity()).recreate();
                 getDialog().dismiss();
             }
         });
-        cancelButton = this.getDialog().findViewById(R.id.button_cancel);
+        Button cancelButton = this.getDialog().findViewById(R.id.button_cancel);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getDialog().dismiss();
             }
         });
-        loadState();
+        settingsMap = StateKeeper.loadState(StateKeeper.OPTION.SETTINGS_DIALOG);
+        langSpinner.setSelection(Integer.parseInt(settingsMap.get(StateKeeper.KEY_LANGUAGE)));
+        periodSeekBar.setProgress(Integer.parseInt(settingsMap.get(StateKeeper.KEY_PERIOD)));
     }
 
     @Override
@@ -104,21 +108,5 @@ public class SettingsDialog extends DialogFragment {
         super.onPause();
     }
 
-    private void saveState() {
-        sharedPref = NewsApplication.appInstance.getSharedPreferences("settings_dialog",
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putLong("language", langSpinner.getSelectedItemId());
-        editor.putInt("period", periodSeekBar.getProgress());
-        editor.apply();
-    }
 
-    private void loadState() {
-        sharedPref = NewsApplication.appInstance.getSharedPreferences("settings_dialog",
-                Context.MODE_PRIVATE);
-        long language = sharedPref.getLong("language",0);
-        int period = sharedPref.getInt("period", 15);
-        langSpinner.setSelection((int)language);
-        periodSeekBar.setProgress(period);
-    }
 }

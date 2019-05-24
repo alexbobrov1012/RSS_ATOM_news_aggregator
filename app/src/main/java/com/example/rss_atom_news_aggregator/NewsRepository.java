@@ -1,17 +1,14 @@
 package com.example.rss_atom_news_aggregator;
 
-import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.rss_atom_news_aggregator.network.NewsParser;
 import com.example.rss_atom_news_aggregator.network.NewsParserATOM;
 import com.example.rss_atom_news_aggregator.network.NewsParserRSS;
-import com.example.rss_atom_news_aggregator.network.NewsService;
 import com.example.rss_atom_news_aggregator.network.NewsWorker;
 import com.example.rss_atom_news_aggregator.room.Channel;
 import com.example.rss_atom_news_aggregator.room.ChannelDao;
@@ -25,7 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -53,15 +50,11 @@ public class NewsRepository {
 
     private NewsParser parser;
 
-    private HttpURLConnection connection;
-
     private Executor executor;
 
     private PeriodicWorkRequest NewsWorkRequestPeriodic;
 
-    private OneTimeWorkRequest NewsWorkRequest;
-
-    private final String TAG_SERVICE = "Worker";
+    private final String TAG_SERVICE = "Worker123";
 
     public NewsRepository() {
         NewsRoomDatabase db = NewsApplication.appInstance.getDBInstance();
@@ -70,44 +63,55 @@ public class NewsRepository {
         AllNews = newsDao.getAllNews();
         AllChannels = channelDao.getAllChannels();
         currentChannel = "";
+        executor =  Executors.newSingleThreadExecutor();
     }
 
-    LiveData<List<News>> getAllNews() {
+    public LiveData<List<News>> getAllNews() {
         return AllNews;
     }
 
-    LiveData<List<Channel>> getAllChannels() {
+    public LiveData<List<Channel>> getAllChannels() {
         return AllChannels;
     }
 
     public void serviceRoutine() {
-        List listNews = new ArrayList<News>();
-        InputStream in = null;
+        List<News> listNews;
+        InputStream in;
+
         // get and parse news
         Log.d(TAG_SERVICE, "in run..");
         try {
-            in = getInputStream(currentChannel);
-            if (in == null)
+            HttpURLConnection connection;
+            URL url = new URL(currentChannel);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.connect();
+            in = connection.getInputStream();
+            if (in == null) {
                 Log.d(TAG_SERVICE, "instream is null");
+                return;
+            }
             listNews = parser.parse(in);
             in.close();
-            deleteAll();
-            insert(listNews);
+            connection.disconnect();
+            if(listNews == null) {
+                Log.d(TAG_SERVICE, "parsing failed");
+                return;
+            } else {
+                deleteAll();
+                insert(listNews);
+            }
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        connection.disconnect();
         Log.d(TAG_SERVICE, "out run..");
     }
 
-    public void fetchNews(Context context, String channelLink) {
-        if (TextUtils.equals(channelLink,currentChannel)) {
+    public void fetchNews(String channelLink) {
+        if (TextUtils.equals(channelLink,currentChannel) || !isOnline()) {
             // fetch from db
             AllNews = newsDao.getAllNews();
-            return;
-
         } else {
             currentChannel = channelLink;
             // fetch from network
@@ -120,36 +124,29 @@ public class NewsRepository {
                 parser = new NewsParserATOM();
 
             }
-
             Constraints constraints = new Constraints.Builder().setRequiredNetworkType(
                     NetworkType.CONNECTED).build();
             if (NewsWorkRequestPeriodic == null) {
                 NewsWorkRequestPeriodic = new PeriodicWorkRequest.Builder(
-                        NewsWorker.class, getRepeatInterval(), TimeUnit.MINUTES)
+                        NewsWorker.class, StateKeeper.getRepeatInterval(), TimeUnit.MINUTES)
                         .setConstraints(constraints)
                           .build();
                 WorkManager.getInstance().enqueueUniquePeriodicWork("fetch_news_worker",
                         ExistingPeriodicWorkPolicy.REPLACE, NewsWorkRequestPeriodic);
             } else {
-                NewsWorkRequest = new OneTimeWorkRequest.Builder(NewsWorker.class).
+                OneTimeWorkRequest newsWorkRequest = new OneTimeWorkRequest.Builder(NewsWorker.class).
                         setConstraints(constraints).build();
-                WorkManager.getInstance().enqueue(NewsWorkRequest);
+                WorkManager.getInstance().enqueue(newsWorkRequest);
             }
         }
     }
 
-    private InputStream getInputStream(String link) throws IOException {
-        URL url = new URL(link);
-        connection = (HttpURLConnection) url.openConnection();
-        connection.connect();
-        return connection.getInputStream();
-    }
-
-    private int getRepeatInterval() {
-        SharedPreferences sharedPref = NewsApplication.appInstance.getSharedPreferences("settings_dialog",
-                Context.MODE_PRIVATE);
-        return sharedPref.getInt("period",0);
-
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) NewsApplication.
+                        appInstance.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
     
     private void insert(List<News> newsList) {
@@ -159,7 +156,6 @@ public class NewsRepository {
     }
 
     public void insert(final Channel channel) {
-        executor =  Executors.newSingleThreadExecutor();
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -169,7 +165,6 @@ public class NewsRepository {
     }
 
     public void delete(final int id) {
-        executor =  Executors.newSingleThreadExecutor();
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -189,13 +184,5 @@ public class NewsRepository {
 
     public String getCurrentChannel() {
         return currentChannel;
-    }
-
-    public void updateChannel(Channel channel) {
-        channelDao.update(channel);
-    }
-
-    public int getChannelId(String name, String link) {
-        return channelDao.getId(name, link);
     }
 }

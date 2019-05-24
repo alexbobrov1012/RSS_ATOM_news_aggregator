@@ -15,23 +15,28 @@ import android.widget.EditText;
 
 import com.example.rss_atom_news_aggregator.NewsApplication;
 import com.example.rss_atom_news_aggregator.R;
+import com.example.rss_atom_news_aggregator.StateKeeper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ChannelAddDialog extends DialogFragment {
 
-    EditText linkText;
+    private EditText linkText;
 
-    EditText nameText;
+    private EditText nameText;
 
-    SharedPreferences sharedPref;
+    private Map<String, String> settingsMap;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        settingsMap = new HashMap<>();
         Log.d("DIALOG","onCreate");
     }
 
@@ -45,7 +50,7 @@ public class ChannelAddDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Log.d("DIALOG","onCreateDiaog");
+        Log.d("DIALOG","onCreateDialog");
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.dialog_add_channel,null));
@@ -57,9 +62,11 @@ public class ChannelAddDialog extends DialogFragment {
         super.onStart();
         Bundle bundle = getArguments();
         this.setArguments(null);
-        linkText = this.getDialog().findViewById(R.id.channel_link_text);
-        nameText = this.getDialog().findViewById(R.id.channel_name_text);
-        loadState();
+        linkText = getDialog().findViewById(R.id.channel_link_text);
+        nameText = getDialog().findViewById(R.id.channel_name_text);
+        settingsMap = StateKeeper.loadState(StateKeeper.OPTION.ADD_DIALOG);
+        nameText.setText(settingsMap.get(StateKeeper.KEY_CHANNEL_NAME));
+        linkText.setText(settingsMap.get(StateKeeper.KEY_CHANNEL_LINK));
         if (bundle != null) {
             String linkData = (String) bundle.get("link");
             linkText.setText(linkData);
@@ -70,24 +77,11 @@ public class ChannelAddDialog extends DialogFragment {
     @Override
     public void onPause() {
         super.onPause();
-        saveState();
+        settingsMap.put(StateKeeper.KEY_CHANNEL_NAME, nameText.getText().toString());
+        settingsMap.put(StateKeeper.KEY_CHANNEL_LINK, linkText.getText().toString());
+        StateKeeper.saveState(StateKeeper.OPTION.ADD_DIALOG, settingsMap);
+        Log.d("DIALOG","onPause");
     }
 
-    private void saveState() {
-        sharedPref = NewsApplication.appInstance.getSharedPreferences("dialog_add",
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("channel_name", nameText.getText().toString());
-        editor.putString("channel_link", linkText.getText().toString());
-        editor.apply();
-    }
 
-    private void loadState() {
-        sharedPref = NewsApplication.appInstance.getSharedPreferences("dialog_add",
-                Context.MODE_PRIVATE);
-        String name = sharedPref.getString("channel_name","");
-        String link = sharedPref.getString("channel_link","");
-        nameText.setText(name);
-        linkText.setText(link);
-    }
 }

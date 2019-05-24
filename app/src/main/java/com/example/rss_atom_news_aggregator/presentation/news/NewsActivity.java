@@ -1,25 +1,17 @@
 package com.example.rss_atom_news_aggregator.presentation.news;
 
 import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 import android.text.TextUtils;
-import android.transition.AutoTransition;
-import android.transition.ChangeBounds;
-import android.transition.ChangeClipBounds;
-import android.transition.ChangeTransform;
-import android.transition.Explode;
 import android.transition.Fade;
 import android.transition.Slide;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.Window;
-import android.widget.Toast;
 
-import com.example.rss_atom_news_aggregator.NewsViewModel;
+import com.example.rss_atom_news_aggregator.NewsApplication;
 import com.example.rss_atom_news_aggregator.R;
 import com.example.rss_atom_news_aggregator.presentation.OnItemListClickListener;
 import com.example.rss_atom_news_aggregator.room.News;
@@ -28,7 +20,9 @@ import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,6 +37,8 @@ public class NewsActivity extends AppCompatActivity implements OnItemListClickLi
     private String link;
 
     NewsListAdapter adapter;
+
+    private static String TAG = "NEWSACTIVITY123";
 
     @Override
     protected void onStart() {
@@ -71,7 +67,7 @@ public class NewsActivity extends AppCompatActivity implements OnItemListClickLi
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                viewModel.fetchNews(NewsActivity.this, link);
+                viewModel.fetchNews(link);
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -84,15 +80,17 @@ public class NewsActivity extends AppCompatActivity implements OnItemListClickLi
         viewModel.getAllNews().observe(this, new Observer<List<News>>() {
             @Override
             public void onChanged(List<News> news) {
-                if (!TextUtils.equals(link, viewModel.getChannelRepo())) {
-                    adapter.removeItems();
+                Log.d(TAG, "OnChanged "  + link +" | " + viewModel.getChannelRepo());
+                if (TextUtils.equals(link, viewModel.getChannelRepo())
+                        || viewModel.getChannelRepo().equals("")) {
+                    adapter.setNews(news);
                 } else {
-                    adapter.setNews(viewModel.getAllNews().getValue());
+                    adapter.removeItems();
                 }
             }
         });
-        viewModel.fetchNews(NewsActivity.this, link);
-        adapter.setNews(viewModel.getAllNews().getValue());
+        viewModel.fetchNews(link);
+        //adapter.setNews(viewModel.getAllNews().getValue());
 
     }
 
@@ -112,4 +110,33 @@ public class NewsActivity extends AppCompatActivity implements OnItemListClickLi
         return true;
     }
 
+    public static class NewsViewModel extends ViewModel {
+        private LiveData<List<News>> allNews;
+
+        private String currentChannel;
+
+        public NewsViewModel() {
+            allNews = NewsApplication.appInstance.getRepository().getAllNews();
+        }
+
+        LiveData<List<News>> getAllNews() {
+            return allNews;
+        }
+
+        void fetchNews(String link) {
+            NewsApplication.appInstance.getRepository().fetchNews(link);
+        }
+
+        void setCurrentChannel(String currentChannel) {
+            this.currentChannel = currentChannel;
+        }
+
+        String getChannelRepo() {
+           return NewsApplication.appInstance.getRepository().getCurrentChannel();
+        }
+
+        public void setChannelRepo(String link) {
+            NewsApplication.appInstance.getRepository().setCurrentChannel(link);
+        }
+    }
 }

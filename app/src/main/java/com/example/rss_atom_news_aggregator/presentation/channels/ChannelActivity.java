@@ -1,15 +1,11 @@
 package com.example.rss_atom_news_aggregator.presentation.channels;
 
 import android.app.ActivityOptions;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 
-import com.example.rss_atom_news_aggregator.ChannelViewModel;
 import com.example.rss_atom_news_aggregator.NewsApplication;
+import com.example.rss_atom_news_aggregator.StateKeeper;
 import com.example.rss_atom_news_aggregator.presentation.news.NewsActivity;
 import com.example.rss_atom_news_aggregator.R;
 import com.example.rss_atom_news_aggregator.presentation.OnItemListClickListener;
@@ -17,16 +13,16 @@ import com.example.rss_atom_news_aggregator.room.Channel;
 import com.example.rss_atom_news_aggregator.Utils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.transition.Explode;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -34,6 +30,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import java.util.List;
+import java.util.Objects;
 
 import static android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP;
 
@@ -52,7 +49,8 @@ public class ChannelActivity extends AppCompatActivity implements OnItemListClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
-        NewsApplication.appInstance.updateLocale(this);
+        StateKeeper.updateLocale(this);
+        Log.v("LOCALE", "ChannelAc");
         setContentView(R.layout.activity_channel);
         Toolbar toolbar = findViewById(R.id.toolbar);
 
@@ -71,11 +69,11 @@ public class ChannelActivity extends AppCompatActivity implements OnItemListClic
         if (Intent.ACTION_SEND.equals(action)) {
             data = intent.getStringExtra(Intent.EXTRA_TEXT);
         } else if (Intent.ACTION_VIEW.equals(action)) {
-            data = intent.getData().toString();
+            data = Objects.requireNonNull(intent.getData()).toString();
         }
         if (data != null) {
             Bundle arg = new Bundle();
-            arg.putCharSequence("link", data.toString());
+            arg.putCharSequence("link", data);
             dialogAdd.setArguments(arg);
             dialogAdd.show(getSupportFragmentManager(), "add_channel");
         }
@@ -111,7 +109,6 @@ public class ChannelActivity extends AppCompatActivity implements OnItemListClic
     @Override
     protected void onPause() {
         super.onPause();
-        //NewsApplication.appInstance.updateLocale(this);
     }
 
     public void dialogClick(View view) {
@@ -122,7 +119,7 @@ public class ChannelActivity extends AppCompatActivity implements OnItemListClic
                 return;
             }
 
-            Channel channel = null;
+            Channel channel;
             EditText nameText = dialogAdd.getDialog().findViewById(R.id.channel_name_text);
             EditText linkText = dialogAdd.getDialog().findViewById(R.id.channel_link_text);
             String name = nameText.getText().toString();
@@ -133,8 +130,6 @@ public class ChannelActivity extends AppCompatActivity implements OnItemListClic
                 viewModel.addChannel(channel);
                 dialogAdd.dismiss();
             }
-            nameText.getText().clear();
-            linkText.getText().clear();
         } else if (view.getId() == R.id.button_cancel) {
             dialogAdd.dismiss();
         }
@@ -148,6 +143,27 @@ public class ChannelActivity extends AppCompatActivity implements OnItemListClic
         intent.putExtra("name", name);
         intent.setFlags(FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+
+    }
+
+    public static class ChannelViewModel extends ViewModel {
+        private LiveData<List<Channel>> allChannels;
+
+        public ChannelViewModel() {
+            allChannels = NewsApplication.appInstance.getRepository().getAllChannels();
+        }
+
+        LiveData<List<Channel>> getAllChannels() {
+            return allChannels;
+        }
+
+        void addChannel(Channel channel) {
+             NewsApplication.appInstance.getRepository().insert(channel);
+        }
+
+        void delete(int id) {
+            NewsApplication.appInstance.getRepository().delete(id);
+        }
 
     }
 }

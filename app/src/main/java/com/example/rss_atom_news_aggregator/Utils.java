@@ -1,15 +1,22 @@
 package com.example.rss_atom_news_aggregator;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class Utils {
+
     public static boolean validateInputChannel(String name, String link, Context context) {
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(link)) {
             Toast hint = Toast.makeText(context.getApplicationContext(), R.string.error_dialog_empty,
@@ -30,13 +37,28 @@ public class Utils {
         return true;
     }
 
-    public static void updateResources(Context context, String language) {
-        Locale locale = new Locale(language);
-        Locale.setDefault(locale);
-        Resources res = context.getResources();
-        Configuration config = new Configuration(res.getConfiguration());
-        config.setLocale(locale);
-        res.updateConfiguration(config, res.getDisplayMetrics());
+
+
+    public static String parseDate(String dateString) {
+        SimpleDateFormat format = new SimpleDateFormat("dd MMM yyyy HH:mm:ss Z", Locale.getDefault());
+        String result = dateString;
+        Calendar cal = Calendar.getInstance(TimeZone.getDefault());
+        try {
+            Date date = format.parse(dateString);
+            cal.setTime(date);
+            int minutes = cal.get(Calendar.MINUTE);
+            int hours = cal.get(Calendar.HOUR_OF_DAY);
+            if(minutes < 10) {
+                result = String.format(Locale.getDefault(),"%d:0%d", hours, minutes);
+            } else {
+                result = String.format(Locale.getDefault(),"%d:%d", hours, minutes);
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
 }

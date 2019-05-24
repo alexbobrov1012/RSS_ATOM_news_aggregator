@@ -58,8 +58,6 @@ public class WebActivity extends AppCompatActivity {
         newsLink = getIntent().getExtras().getString("link");
         webView = findViewById(R.id.webview);
         webView.setWebViewClient(webViewClient);
-        webView.getSettings().getJavaScriptEnabled();
-
         final SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipe_refresh_web);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override

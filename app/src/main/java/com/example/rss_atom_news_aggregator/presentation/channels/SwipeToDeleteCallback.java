@@ -1,7 +1,5 @@
 package com.example.rss_atom_news_aggregator.presentation.channels;
 
-import com.example.rss_atom_news_aggregator.ChannelViewModel;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -9,9 +7,9 @@ import androidx.recyclerview.widget.RecyclerView;
 public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
     ChannelListAdapter adapter;
 
-    ChannelViewModel viewModel;
+    ChannelActivity.ChannelViewModel viewModel;
 
-    public SwipeToDeleteCallback(ChannelListAdapter adapter, ChannelViewModel viewModel) {
+    public SwipeToDeleteCallback(ChannelListAdapter adapter, ChannelActivity.ChannelViewModel viewModel) {
         super(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT );
         this.adapter = adapter;
         this.viewModel = viewModel;
