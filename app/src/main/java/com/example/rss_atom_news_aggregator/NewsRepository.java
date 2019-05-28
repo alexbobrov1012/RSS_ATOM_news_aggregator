@@ -64,6 +64,16 @@ public class NewsRepository {
         AllChannels = channelDao.getAllChannels();
         currentChannel = "";
         executor =  Executors.newSingleThreadExecutor();
+        prePopulateDB();
+    }
+
+    private void prePopulateDB() {
+        Channel channel = new Channel("Культура", "https://news.yandex.ru/culture.rss");
+        insert(channel);
+        channel = new Channel("Спорт", "https://news.yandex.ru/sport.rss");
+        insert(channel);
+        channel = new Channel("Google-news", "https://news.google.com/news/rss");
+        insert(channel);
     }
 
     public LiveData<List<News>> getAllNews() {

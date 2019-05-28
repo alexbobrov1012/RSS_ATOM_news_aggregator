@@ -76,7 +76,6 @@ public class NewsActivity extends AppCompatActivity implements OnItemListClickLi
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         viewModel = ViewModelProviders.of(this).get(NewsViewModel.class);
-        viewModel.setCurrentChannel(link);
         viewModel.getAllNews().observe(this, new Observer<List<News>>() {
             @Override
             public void onChanged(List<News> news) {
@@ -113,8 +112,6 @@ public class NewsActivity extends AppCompatActivity implements OnItemListClickLi
     public static class NewsViewModel extends ViewModel {
         private LiveData<List<News>> allNews;
 
-        private String currentChannel;
-
         public NewsViewModel() {
             allNews = NewsApplication.appInstance.getRepository().getAllNews();
         }
@@ -127,16 +124,8 @@ public class NewsActivity extends AppCompatActivity implements OnItemListClickLi
             NewsApplication.appInstance.getRepository().fetchNews(link);
         }
 
-        void setCurrentChannel(String currentChannel) {
-            this.currentChannel = currentChannel;
-        }
-
         String getChannelRepo() {
            return NewsApplication.appInstance.getRepository().getCurrentChannel();
-        }
-
-        public void setChannelRepo(String link) {
-            NewsApplication.appInstance.getRepository().setCurrentChannel(link);
         }
     }
 }

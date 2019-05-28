@@ -25,7 +25,7 @@ public class NewsApplication extends Application {
         super.onCreate();
         appInstance = this;
         dbInstance = Room.databaseBuilder(this,
-                NewsRoomDatabase.class, "news_database1")
+                NewsRoomDatabase.class, "news_database2")
                   .addCallback(new RoomDatabase.Callback() {
                       @Override
                       public void onOpen(@NonNull SupportSQLiteDatabase db) {

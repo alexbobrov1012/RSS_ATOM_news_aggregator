@@ -8,12 +8,13 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "channel_table")
 public class Channel {
-    @PrimaryKey(autoGenerate = true)
-    @NonNull
+
     private int id;
 
     private String name;
 
+    @PrimaryKey
+    @NonNull
     private String link;
 
     public Channel(String name, String link) {
