@@ -174,11 +174,11 @@ public class NewsRepository {
         });
     }
 
-    public void delete(final int id) {
+    public void delete(final String link) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                channelDao.delete(id);
+                channelDao.delete(link);
             }
         });
 

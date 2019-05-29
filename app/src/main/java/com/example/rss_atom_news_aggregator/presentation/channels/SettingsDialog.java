@@ -1,6 +1,7 @@
 package com.example.rss_atom_news_aggregator.presentation.channels;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -87,7 +88,9 @@ public class SettingsDialog extends DialogFragment {
                 StateKeeper.saveState(StateKeeper.OPTION.SETTINGS_DIALOG, settingsMap);
                 StateKeeper.updateLocale(getDialog().getContext().getApplicationContext());
                 Log.v("LOCALE", "Settings2");
-                Objects.requireNonNull(getActivity()).recreate();
+                Intent intent =new Intent(getActivity(), ChannelActivity.class);
+                getActivity().finish();
+                startActivity(intent);
                 getDialog().dismiss();
             }
         });

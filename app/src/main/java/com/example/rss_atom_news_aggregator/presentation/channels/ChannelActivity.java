@@ -35,9 +35,6 @@ import java.util.Objects;
 import static android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP;
 
 public class ChannelActivity extends AppCompatActivity implements OnItemListClickListener {
-    ChannelAddDialog dialogAdd;
-
-    SettingsDialog dialogSettings;
 
     ChannelViewModel viewModel;
 
@@ -61,8 +58,8 @@ public class ChannelActivity extends AppCompatActivity implements OnItemListClic
                 finish();
             }
         });
-        dialogAdd = new ChannelAddDialog();
-        dialogSettings = new SettingsDialog();
+        final ChannelAddDialog dialogAdd = new ChannelAddDialog();
+        final SettingsDialog dialogSettings = new SettingsDialog();
         Intent intent = getIntent();
         String action = intent.getAction();
         String data = null;
@@ -111,30 +108,6 @@ public class ChannelActivity extends AppCompatActivity implements OnItemListClic
         super.onPause();
     }
 
-    public void dialogClick(View view) {
-        if (view.getId() == R.id.button_ok) {
-            // create new channel
-            if (dialogAdd.getDialog() == null) {
-                Log.v("DIALOG", "bad");
-                return;
-            }
-
-            Channel channel;
-            EditText nameText = dialogAdd.getDialog().findViewById(R.id.channel_name_text);
-            EditText linkText = dialogAdd.getDialog().findViewById(R.id.channel_link_text);
-            String name = nameText.getText().toString();
-            String link = linkText.getText().toString();
-
-            if (Utils.validateInputChannel(name, link, this)) {
-                channel = new Channel(nameText.getText().toString(), linkText.getText().toString());
-                viewModel.addChannel(channel);
-                dialogAdd.dismiss();
-            }
-        } else if (view.getId() == R.id.button_cancel) {
-            dialogAdd.dismiss();
-        }
-    }
-
     @Override
     public void onItemListClick(int position, String link) {
         Intent intent = new Intent(this, NewsActivity.class);
@@ -146,24 +119,4 @@ public class ChannelActivity extends AppCompatActivity implements OnItemListClic
 
     }
 
-    public static class ChannelViewModel extends ViewModel {
-        private LiveData<List<Channel>> allChannels;
-
-        public ChannelViewModel() {
-            allChannels = NewsApplication.appInstance.getRepository().getAllChannels();
-        }
-
-        LiveData<List<Channel>> getAllChannels() {
-            return allChannels;
-        }
-
-        void addChannel(Channel channel) {
-             NewsApplication.appInstance.getRepository().insert(channel);
-        }
-
-        void delete(int id) {
-            NewsApplication.appInstance.getRepository().delete(id);
-        }
-
-    }
 }

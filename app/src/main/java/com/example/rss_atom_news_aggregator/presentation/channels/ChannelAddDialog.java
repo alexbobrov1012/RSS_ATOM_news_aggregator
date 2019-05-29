@@ -11,21 +11,29 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.rss_atom_news_aggregator.NewsApplication;
 import com.example.rss_atom_news_aggregator.R;
 import com.example.rss_atom_news_aggregator.StateKeeper;
+import com.example.rss_atom_news_aggregator.Utils;
+import com.example.rss_atom_news_aggregator.room.Channel;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProviders;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChannelAddDialog extends DialogFragment {
+public class ChannelAddDialog extends DialogFragment implements View.OnClickListener {
+
+    Button applyButton;
+
+    Button cancelButton;
 
     private EditText linkText;
 
@@ -33,18 +41,25 @@ public class ChannelAddDialog extends DialogFragment {
 
     private Map<String, String> settingsMap;
 
+    private ChannelViewModel viewModel;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         settingsMap = new HashMap<>();
+        viewModel = ViewModelProviders.of(this).get(ChannelViewModel.class);
         Log.d("DIALOG","onCreate");
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
     }
 
     @NonNull
@@ -53,7 +68,12 @@ public class ChannelAddDialog extends DialogFragment {
         Log.d("DIALOG","onCreateDialog");
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        builder.setView(inflater.inflate(R.layout.dialog_add_channel,null));
+        View view = inflater.inflate(R.layout.dialog_add_channel,null);
+        applyButton = view.findViewById(R.id.button_ok);
+        applyButton.setOnClickListener(this);
+        cancelButton = view.findViewById(R.id.button_cancel);
+        cancelButton.setOnClickListener(this);
+        builder.setView(view);
         return builder.create();
     }
 
@@ -61,12 +81,8 @@ public class ChannelAddDialog extends DialogFragment {
     public void onStart() {
         super.onStart();
         Bundle bundle = getArguments();
-        this.setArguments(null);
-        linkText = getDialog().findViewById(R.id.channel_link_text);
-        nameText = getDialog().findViewById(R.id.channel_name_text);
-        settingsMap = StateKeeper.loadState(StateKeeper.OPTION.ADD_DIALOG);
-        nameText.setText(settingsMap.get(StateKeeper.KEY_CHANNEL_NAME));
-        linkText.setText(settingsMap.get(StateKeeper.KEY_CHANNEL_LINK));
+        setArguments(null);
+        loadState();
         if (bundle != null) {
             String linkData = (String) bundle.get("link");
             linkText.setText(linkData);
@@ -77,11 +93,50 @@ public class ChannelAddDialog extends DialogFragment {
     @Override
     public void onPause() {
         super.onPause();
-        settingsMap.put(StateKeeper.KEY_CHANNEL_NAME, nameText.getText().toString());
-        settingsMap.put(StateKeeper.KEY_CHANNEL_LINK, linkText.getText().toString());
-        StateKeeper.saveState(StateKeeper.OPTION.ADD_DIALOG, settingsMap);
+        saveState(nameText.getText().toString(), linkText.getText().toString());
         Log.d("DIALOG","onPause");
     }
 
+    private void saveState(String name, String link) {
+        settingsMap.clear();
+        settingsMap.put(StateKeeper.KEY_CHANNEL_NAME, name);
+        settingsMap.put(StateKeeper.KEY_CHANNEL_LINK, link);
+        StateKeeper.saveState(StateKeeper.OPTION.ADD_DIALOG, settingsMap);
+    }
 
+    private void loadState() {
+        linkText = getDialog().findViewById(R.id.channel_link_text);
+        nameText = getDialog().findViewById(R.id.channel_name_text);
+        settingsMap = StateKeeper.loadState(StateKeeper.OPTION.ADD_DIALOG);
+        nameText.setText(settingsMap.get(StateKeeper.KEY_CHANNEL_NAME));
+        linkText.setText(settingsMap.get(StateKeeper.KEY_CHANNEL_LINK));
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.button_ok) {
+            // create new channel
+            if (getDialog() == null) {
+                Log.v("DIALOG", "bad");
+                return;
+            }
+
+            Channel channel;
+            EditText nameText = getDialog().findViewById(R.id.channel_name_text);
+            EditText linkText = getDialog().findViewById(R.id.channel_link_text);
+            String name = nameText.getText().toString();
+            String link = linkText.getText().toString();
+
+            if (Utils.validateInputChannel(name, link, getContext())) {
+                channel = new Channel(nameText.getText().toString(), linkText.getText().toString());
+                viewModel.addChannel(channel);
+                Log.v("DIALOG", "keke");
+                nameText.setText("");
+                linkText.setText("");
+                dismiss();
+            }
+        } else if (v.getId() == R.id.button_cancel) {
+            dismiss();
+        }
+    }
 }

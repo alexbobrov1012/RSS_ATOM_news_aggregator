@@ -89,8 +89,6 @@ public class NewsActivity extends AppCompatActivity implements OnItemListClickLi
             }
         });
         viewModel.fetchNews(link);
-        //adapter.setNews(viewModel.getAllNews().getValue());
-
     }
 
     @Override

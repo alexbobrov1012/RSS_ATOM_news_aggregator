@@ -1,5 +1,7 @@
 package com.example.rss_atom_news_aggregator.presentation.channels;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -7,9 +9,9 @@ import androidx.recyclerview.widget.RecyclerView;
 public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
     ChannelListAdapter adapter;
 
-    ChannelActivity.ChannelViewModel viewModel;
+    ChannelViewModel viewModel;
 
-    public SwipeToDeleteCallback(ChannelListAdapter adapter, ChannelActivity.ChannelViewModel viewModel) {
+    public SwipeToDeleteCallback(ChannelListAdapter adapter, ChannelViewModel viewModel) {
         super(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT );
         this.adapter = adapter;
         this.viewModel = viewModel;
@@ -23,8 +25,8 @@ public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
         int position = viewHolder.getAdapterPosition();
-        int id = adapter.getChannelId(position);
-        viewModel.delete(id);
-
+        String link = adapter.getChannelLink(position);
+        viewModel.delete(link);
+        Log.d("DIALOG","ID = " + link);
     }
 }

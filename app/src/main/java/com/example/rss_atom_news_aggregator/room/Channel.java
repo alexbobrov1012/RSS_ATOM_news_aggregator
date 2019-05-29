@@ -21,12 +21,6 @@ public class Channel {
         this.name = name;
         this.link = link;
     }
-    @Ignore
-    public Channel(int id, String name, String link) {
-        this.id = id;
-        this.name = name;
-        this.link = link;
-    }
 
     public int getId() {
         return id;

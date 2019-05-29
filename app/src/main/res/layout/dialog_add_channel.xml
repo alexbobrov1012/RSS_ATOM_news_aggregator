@@ -57,7 +57,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="dialogClick"
             android:text="@string/cancel"
             app:layout_constraintTop_toBottomOf="@id/channel_link_text" />
 
@@ -67,7 +66,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="dialogClick"
             android:text="@string/add"
             app:layout_constraintTop_toBottomOf="@id/channel_link_text" />
     </LinearLayout>

@@ -20,12 +20,7 @@ public interface ChannelDao {
     @Query ("select * from channel_table")
     LiveData<List<Channel>> getAllChannels();
 
-    @Query("delete from channel_table where id = :id")
-    void delete(int id);
+    @Query("delete from channel_table where link = :link")
+    void delete(String link);
 
-    @Update
-    void update(Channel channel);
-
-    @Query("select id from channel_table where name = :name and link = :link")
-    int getId(String name, String link);
 }
